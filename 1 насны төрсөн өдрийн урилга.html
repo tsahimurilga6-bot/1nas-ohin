@@ -197,6 +197,12 @@ background:radial-gradient(circle at 35% 30%,#fae7b4,#cca04b 55%,#996f22);box-sh
 .venue strong{font:700 19px/1.25 'Cormorant Garamond',serif;margin-bottom:6px}
 .venue span{font-size:12.5px}
 @media (max-width:360px){.box.line .val{font-size:18px}}
+.music{font-family:'Noto Serif',serif;font-size:13px;font-weight:600;padding:11px 22px;background:linear-gradient(135deg,#fff,#fdf1f4);border:1.5px solid var(--gold);box-shadow:0 6px 18px rgba(197,155,75,.28);letter-spacing:.4px}
+.box.line .val{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:700;font-size:22px;letter-spacing:.4px;font-variant-numeric:lining-nums;background:linear-gradient(100deg,#7a5a1c,#c59b4b 50%,#7a5a1c);-webkit-background-clip:text;background-clip:text;color:transparent}
+.num{font-variant-numeric:lining-nums}
+@media (max-width:360px){.box.line .val{font-size:18px}}
+.ph{position:relative;overflow:hidden}
+.ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
 /* ===== reveal + entrance ===== */
 @keyframes fadeUp{from{opacity:0;transform:translate(-50%,18px)}to{opacity:1;transform:translate(-50%,0)}}
 .badge{animation-name:fadeUp}
@@ -211,7 +217,7 @@ background:radial-gradient(circle at 35% 30%,#fae7b4,#cca04b 55%,#996f22);box-sh
 <body class="locked">
 <canvas id="fx"></canvas>
 <div id="progress"></div>
-<audio id="music" src="birthday.mp3" loop preload="auto"></audio>
+<audio id="music" src="Булцгар найзууд Төрсөн өдрийн дуу.mp3" loop preload="auto"></audio>
 
 <section class="stage" id="stage">
   <div class="backdrop"></div>
@@ -266,7 +272,6 @@ background:radial-gradient(circle at 35% 30%,#fae7b4,#cca04b 55%,#996f22);box-sh
 
     <div class="st" style="--d:.25s"><svg class="bigcake" width="176" viewBox="0 0 160 150" fill="none"><ellipse cx="80" cy="140" rx="68" ry="7" fill="#e6d5bd"/><ellipse cx="80" cy="137" rx="62" ry="6" fill="#f5ece2" stroke="#d7c3aa"/><rect x="20" y="94" width="120" height="40" rx="10" fill="#f6d3dc" stroke="#e3a3b6" stroke-width="1.2"/><path d="M20 106q10 10 20 0t20 0 20 0 20 0 20 0 20 0" stroke="#fff" stroke-width="5" stroke-linecap="round" fill="none"/><rect x="42" y="62" width="76" height="34" rx="9" fill="#fff6dc" stroke="#c59b4b" stroke-width="1.2"/><path d="M42 73q9.5 9 19 0t19 0 19 0 19 0" stroke="#f3c6d0" stroke-width="5" stroke-linecap="round" fill="none"/><circle class="tw" cx="34" cy="122" r="2.5" fill="#c59b4b"/><circle class="tw" cx="58" cy="119" r="2.5" fill="#fff" style="animation-delay:.4s"/><circle class="tw" cx="82" cy="124" r="2.5" fill="#d6c9e6" style="animation-delay:.8s"/><circle class="tw" cx="106" cy="119" r="2.5" fill="#c59b4b" style="animation-delay:1.2s"/><circle class="tw" cx="126" cy="124" r="2.5" fill="#fff" style="animation-delay:.2s"/><circle class="tw" cx="54" cy="87" r="2.2" fill="#e8a9bd" style="animation-delay:.6s"/><circle class="tw" cx="106" cy="87" r="2.2" fill="#c59b4b" style="animation-delay:1s"/><path d="M66 31L77 23H89V62H77V37L66 41Z" fill="#f0c25a" stroke="#c59b4b" stroke-width="1.2" stroke-linejoin="round"/><path d="M82 40V58" stroke="#fff" stroke-width="2" opacity=".55" stroke-linecap="round"/><path d="M83 23V18" stroke="#5b434d" stroke-width="1.6" stroke-linecap="round"/><circle class="glow" cx="83" cy="11" r="11" fill="#ffe9a8" opacity=".5"/><path class="flame2" d="M83 2C88 9 88 15 83 18 78 15 78 9 83 2Z" fill="#f5b942"/><path class="flame2" d="M83 9C85 12 85 15 83 17 81 15 81 12 83 9Z" fill="#fff3b0"/><g transform="translate(28 70)"><path class="fh" d="M0 3C-5-2-3-7 0-4 3-7 5-2 0 3Z" fill="#e8a9bd"/></g><g transform="translate(136 62)"><path class="fh" d="M0 3C-5-2-3-7 0-4 3-7 5-2 0 3Z" fill="#d6a8d8" style="animation-delay:1s"/></g><g transform="translate(18 92)"><path class="fh" d="M0 3C-5-2-3-7 0-4 3-7 5-2 0 3Z" fill="#f0c25a" style="animation-delay:2s"/></g><g transform="translate(144 88)"><path class="fh" d="M0 3C-5-2-3-7 0-4 3-7 5-2 0 3Z" fill="#e8a9bd" style="animation-delay:1.5s"/></g><g transform="translate(112 50)"><path class="fh" d="M0 3C-5-2-3-7 0-4 3-7 5-2 0 3Z" fill="#f0c25a" style="animation-delay:.5s"/></g></svg></div>
     <div class="st" style="--d:.4s"><div class="big">Урилга</div></div>
-    <h1 class="name st" style="--d:.55s">Б. Амин-Эрдэнэ</h1>
     <p class="sub st" style="--d:.75s">Эрхэм хүндэт таныг бидний хайрт охин<span class="hl">Б.Амин-Эрдэнийн</span>“1 насны төрсөн өдрийн баярт” гэр бүлийн хамт хүрэлцэн ирэхийг урьж байна.</p>
     <svg class="cake st" style="--d:.9s" viewBox="0 0 54 56" fill="none">
       <path class="flame" d="M27 2C31 8 31 12 27 14 23 12 23 8 27 2Z" fill="#f5b942"/>
@@ -275,12 +280,11 @@ background:radial-gradient(circle at 35% 30%,#fae7b4,#cca04b 55%,#996f22);box-sh
       <path d="M6 30q5 5 10 0t10 0 10 0 10 0" stroke="#fff" stroke-width="2" fill="none"/>
       <rect x="2" y="37" width="50" height="14" rx="5" fill="#f0dcb0" stroke="#c59b4b"/>
     </svg>
-    <button type="button" class="music st" style="--d:1s" id="musicBtn"><span class="eq"><i></i><i></i><i></i></span><span id="musicLabel">Хөгжим тоглуулах</span></button>
+    <button type="button" class="music st" style="--d:1s" id="musicBtn"><span class="eq"><i></i><i></i><i></i></span><span id="musicLabel">🎶 Баярын хөгжим тоглуулах</span></button>
   </header>
 
   <div class="wrap">
     <section class="card reveal"><div class="inner">
-      
       <div class="grid2">
         <div class="box line"><span class="lbl">ОГНОО</span><span class="val">2026 оны 12-р сарын 15</span></div>
         <div class="box line"><span class="lbl">ЦАГ</span><span class="val">15:00 цагт</span></div>
@@ -301,13 +305,13 @@ background:radial-gradient(circle at 35% 30%,#fae7b4,#cca04b 55%,#996f22);box-sh
     <section class="card reveal"><div class="inner">
       <h2 class="h2">Бяцхан Дурсамж</h2>
       <div class="photos">
-        <div class="photo"><div class="ph"><svg width="44" height="44" viewBox="0 0 24 24" fill="#fff"><path d="M12 21s-7.5-4.6-9.6-9.2C1 8.5 3 5 6.4 5c2 0 3.6 1.1 5.6 3.2C14 6.1 15.600 5 17.600 5 21 5 23 8.500 21.600 11.800 19.500 16.400 12 21 12 21z"/></svg></div><span>Анхны инээмсэглэл</span></div>
-        <div class="photo"><div class="ph" style="animation-delay:-3s"><svg width="44" height="44" viewBox="0 0 24 24" fill="#fff"><path d="M12 2l2.900 6.300 6.900.8-5.100 4.700 1.400 6.800L12 17.200 5.900 20.600l1.400-6.800L2.200 9.100l6.900-.8z"/></svg></div><span>1 насны мөч</span></div>
+        <div class="photo"><div class="ph"><svg width="44" height="44" viewBox="0 0 24 24" fill="#fff"><path d="M12 21s-7.5-4.6-9.6-9.2C1 8.5 3 5 6.4 5c2 0 3.6 1.1 5.6 3.2C14 6.1 15.600 5 17.600 5 21 5 23 8.500 21.600 11.800 19.500 16.400 12 21 12 21z"/></svg><img src="1.JPG" alt="Анхны инээмсэглэл" loading="lazy" onerror="this.style.display='none'"></div><span>Анхны инээмсэглэл</span></div>
+        <div class="photo"><div class="ph" style="animation-delay:-3s"><svg width="44" height="44" viewBox="0 0 24 24" fill="#fff"><path d="M12 2l2.900 6.300 6.900.8-5.100 4.700 1.400 6.800L12 17.200 5.900 20.600l1.400-6.800L2.200 9.100l6.900-.8z"/></svg><img src="2.JPG" alt="1 насны мөч" loading="lazy" onerror="this.style.display='none'"></div><span>1 насны мөч</span></div>
       </div>
     </div></section>
 
     <section class="card reveal"><div class="inner">
-      <h2 class="h2">Оролцох эсэх</h2>
+      <h2 class="h2">Хариу илгээх</h2>
       <p style="font-size:12px;color:var(--muted);margin-bottom:16px">Та хүрэлцэн ирэх эсэхээ урьдчилан баталгаажуулна уу.</p>
       <form id="rsvp">
         <div class="field"><label for="gn">Таны нэр</label><input class="inp" id="gn" type="text" placeholder="Жишээ: Болд" required></div>
@@ -378,8 +382,8 @@ loop();
 
 /* хаалга */
 function setMusic(on){
-  if(on){audio.play().then(function(){mBtn.classList.add('playing');mLbl.textContent='Хөгжим түр зогсоох'}).catch(function(){})}
-  else{audio.pause();mBtn.classList.remove('playing');mLbl.textContent='Хөгжим тоглуулах'}
+  if(on){audio.play().then(function(){mBtn.classList.add('playing');mLbl.textContent='🎵 Хөгжим зогсоох'}).catch(function(){})}
+  else{audio.pause();mBtn.classList.remove('playing');mLbl.textContent='🎶 Баярын хөгжим тоглуулах'}
 }
 function openGate(){
   if(stage.classList.contains('open'))return;
@@ -392,7 +396,7 @@ function openGate(){
 $('sealBtn').onclick=openGate;$('hintBtn').onclick=openGate;
 $('backBtn').onclick=function(){scrollTo({top:0});stage.classList.remove('open');body.classList.add('locked');body.classList.remove('started')};
 mBtn.onclick=function(){
-  if(audio.paused){audio.play().then(function(){mBtn.classList.add('playing');mLbl.textContent='Хөгжим түр зогсоох'}).catch(function(){alert('Дууны файл (birthday.mp3) холбогдоогүй байна.')})}
+  if(audio.paused){audio.play().then(function(){mBtn.classList.add('playing');mLbl.textContent='🎵 Хөгжим зогсоох'}).catch(function(){alert('Дууны файл холбогдоогүй байна.')})}
   else setMusic(false);
 };
 
