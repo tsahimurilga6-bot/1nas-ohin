@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<title>1 насны төрсөн өдрийн урилга</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Noto+Serif:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--ivory:#fcfaf6;--cream:#f5ece2;--rose:#dfa7b6;--gold:#c59b4b;--goldL:#f0dcb0;--ink:#3a2b24;--muted:#6b5950;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-behavior:smooth}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--ivory);color:var(--ink);font-family:'Noto Serif',Georgia,serif;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+body.locked{overflow:hidden}
+#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:300}
+#progress{position:fixed;top:0;left:0;height:3px;width:0;background:linear-gradient(90deg,var(--rose),var(--gold));z-index:250}
+
+/* ===== GATE ===== */
+.stage{position:fixed;inset:0;z-index:200;background:#efe4de;overflow:hidden;display:flex;align-items:center;justify-content:center;perspective:1400px;transition:opacity .6s,visibility .6s}
+.stage.open{opacity:0;visibility:hidden;pointer-events:none;transition:opacity 1s ease 1.75s,visibility 1s ease 1.75s}
+.backdrop{position:absolute;inset:-8%;z-index:1;transition:transform 2.2s cubic-bezier(.22,1,.36,1),filter 1.8s;
+background:radial-gradient(circle at 50% 30%,#fffbe9 0%,#f8e1e8 40%,#c9b5d3 100%)}
+.stage.open .backdrop{transform:scale(1.42);filter:brightness(1.12)}
+.bokeh{position:absolute;border-radius:50%;filter:blur(6px);opacity:.55;animation:bokeh 9s ease-in-out infinite alternate;z-index:1}
+@keyframes bokeh{from{transform:translate(0,0) scale(1)}to{transform:translate(18px,-30px) scale(1.25)}}
+.rays{position:absolute;top:-20%;left:50%;width:180%;height:90%;z-index:2;pointer-events:none;transform:translateX(-50%);
+background:conic-gradient(from 165deg at 50% 0%,transparent 0,rgba(255,250,230,.5) 12deg,transparent 24deg,rgba(255,246,220,.55) 36deg,transparent 50deg);animation:ray 7s ease-in-out infinite alternate}
+@keyframes ray{from{transform:translateX(-52%) rotate(-2deg)}to{transform:translateX(-48%) rotate(2deg)}}
+.arch{position:relative;width:min(380px,94vw);height:min(610px,80vh);z-index:4;display:flex;align-items:center;justify-content:center;transform-style:preserve-3d;
+transition:transform 2s cubic-bezier(.22,1,.36,1) .25s;animation:archIn 1.2s cubic-bezier(.22,1,.36,1) both}
+@keyframes archIn{from{opacity:0;transform:translateY(40px) scale(.92)}to{opacity:1;transform:none}}
+.stage.open .arch{transform:scale(1.45) translateZ(180px)}
+.frame{position:absolute;inset:0;border-radius:200px 200px 16px 16px;border:14px solid #f4ebe1;z-index:6;pointer-events:none;
+box-shadow:0 24px 55px rgba(58,43,36,.28),inset 0 0 0 3px #d7c3aa,inset 0 0 18px rgba(197,155,75,.35),0 0 0 2px #dfd0be}
+.frame::after{content:"";position:absolute;inset:-14px;border-radius:inherit;background:linear-gradient(115deg,transparent 40%,rgba(255,255,255,.7) 50%,transparent 60%);background-size:250% 100%;animation:shine 4.5s ease-in-out infinite;mix-blend-mode:overlay}
+@keyframes shine{from{background-position:150% 0}to{background-position:-50% 0}}
+.door{position:absolute;inset:12px;border-radius:188px 188px 8px 8px;z-index:4;overflow:hidden;border:2px solid #d5c1a8;
+background:radial-gradient(circle at 50% 42%,#fcf8f3,#ede1d3 72%,#dfd0be);box-shadow:inset 0 0 30px rgba(138,114,92,.18);
+transform-origin:right center;transition:transform 1.45s cubic-bezier(.28,.9,.32,1) .35s}
+.stage.open .door{transform:rotateY(108deg)}
+.flap{position:absolute;top:0;left:0;right:0;height:52%;background:linear-gradient(180deg,#faf4ec,#e7d8c5);clip-path:polygon(0 0,100% 0,50% 96%);transform-origin:top;transition:transform .6s}
+.stage.open .flap{transform:rotateX(165deg)}
+.door svg.lines{position:absolute;inset:0;width:100%;height:100%}
+.gtitle{position:absolute;left:0;right:0;top:62%;text-align:center;z-index:3;pointer-events:none}
+.gtitle small{display:block;font:600 9.5px 'Noto Serif',serif;letter-spacing:3.5px;color:#8a6f4a;opacity:0;animation:fadeIn 1s ease 1.2s forwards}
+.gtitle b{display:block;font:italic 600 clamp(46px,14vw,58px)/1.1 'Cormorant Garamond',serif;background:linear-gradient(100deg,#9a7425 30%,#e8c46f 45%,#fff3cf 50%,#e8c46f 55%,#9a7425 70%);background-size:250% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 2px 3px rgba(120,90,30,.25));opacity:0;animation:fadeIn 1.2s ease .9s forwards,shimmer 4.5s linear 2s infinite}
+.gtitle svg{display:block;margin:2px auto 0;opacity:0;animation:fadeIn 1s ease 1.5s forwards}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.done.bad{background:#fff1ee;border-color:#e0a090}
+.btn:disabled{opacity:.7;cursor:wait}
+.handle{position:absolute;left:18px;top:52%;width:24px;height:68px;margin-top:-34px;border-radius:14px;background:linear-gradient(180deg,#f3dca3,#c49743,#966d23);border:1.5px solid #fff3cf;box-shadow:0 4px 12px rgba(58,43,36,.35)}
+.crown{position:absolute;top:-22px;left:50%;transform:translateX(-50%);width:210px;z-index:8;pointer-events:none;filter:drop-shadow(0 6px 10px rgba(58,43,36,.18))}
+.seal{position:relative;z-index:9;width:92px;height:92px;border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;
+background:radial-gradient(circle at 35% 30%,#fae7b4,#cca04b 55%,#996f22);box-shadow:0 10px 26px rgba(99,70,20,.45),inset 0 2px 8px rgba(255,255,255,.75);animation:breath 2.6s ease-in-out infinite;transition:transform .4s,opacity .45s}
+.seal::before,.seal::after{content:"";position:absolute;inset:0;border-radius:50%;border:2px solid var(--gold);animation:pulse 2.6s ease-out infinite}
+.seal::after{animation-delay:1.3s}
+@keyframes pulse{from{transform:scale(1);opacity:.8}to{transform:scale(2.1);opacity:0}}
+@keyframes breath{50%{transform:scale(1.07)}}
+.seal svg{animation:spin 18s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.stage.open .seal{transform:scale(.6);opacity:0;animation:none}
+.seal{width:112px;height:112px;background:radial-gradient(circle at 50% 38%,#fffdf6,#f8e9cc 70%,#efd7a6);border:2px solid var(--gold);box-shadow:0 10px 28px rgba(99,70,20,.4),inset 0 0 14px rgba(197,155,75,.35)}
+.seal svg{animation:none;filter:drop-shadow(0 2px 3px rgba(120,60,80,.25))}
+.sp1,.sp2,.sp3{transform-box:view-box;transform-origin:50px 50px}
+.sp1{animation:spin 40s linear infinite}
+.sp2{animation:spin 28s linear infinite reverse}
+.sp3{animation:spin 20s linear infinite}
+.core{transform-box:fill-box;transform-origin:center;animation:beat 1.8s ease-in-out infinite}
+.bq{position:absolute;bottom:-14px;width:175px;pointer-events:none;z-index:8;transform-origin:bottom center}
+.bq.l{left:-18px;animation:sway 4.5s ease-in-out infinite alternate}
+.bq.r{right:-18px;animation:swayR 5s ease-in-out infinite alternate}
+@keyframes sway{from{transform:rotate(-3deg)}to{transform:rotate(3deg)}}
+@keyframes swayR{from{transform:scaleX(-1) rotate(-3deg)}to{transform:scaleX(-1) rotate(3deg)}}
+.bq.r{transform:scaleX(-1)}
+.badge{position:absolute;bottom:max(24px,env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);z-index:10;display:flex;flex-direction:column;align-items:center;gap:8px;animation:fadeUp 1s ease .8s both}
+.crest{width:54px;height:54px;border-radius:50%;background:rgba(255,251,244,.88);border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font:italic 700 25px 'Cormorant Garamond',serif;color:var(--gold);box-shadow:0 6px 18px rgba(58,43,36,.22);animation:float 3s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(-6px)}}
+.hint{background:rgba(255,252,247,.92);border:1px solid rgba(197,155,75,.55);padding:7px 18px;border-radius:999px;font:700 11px 'Noto Serif',serif;letter-spacing:2.5px;color:var(--ink);cursor:pointer;animation:glow 2s ease-in-out infinite}
+@keyframes glow{50%{box-shadow:0 0 18px rgba(197,155,75,.6)}}
+.bf{position:absolute;width:38px;height:38px;pointer-events:none;z-index:9;filter:drop-shadow(0 4px 6px rgba(80,55,70,.2))}
+.bf .a{transform-origin:20px 20px;animation:flapL .42s ease-in-out infinite alternate}
+.bf .b{transform-origin:20px 20px;animation:flapR .42s ease-in-out infinite alternate}
+@keyframes flapL{to{transform:scaleX(.35) rotate(-12deg)}}
+@keyframes flapR{to{transform:scaleX(.35) rotate(12deg)}}
+@keyframes fly{0%,100%{transform:translate(0,0) rotate(-8deg)}25%{transform:translate(40px,-30px) rotate(12deg)}50%{transform:translate(-10px,-60px) rotate(-6deg)}75%{transform:translate(-40px,-25px) rotate(10deg)}}
+
+/* ===== MAIN ===== */
+.page{max-width:460px;margin:0 auto;min-height:100vh;padding-bottom:42px;background:linear-gradient(180deg,#fdf5f7,#fcfaf6 38%,#f6efe7);position:relative}
+.hero{position:relative;padding:28px 20px 30px;text-align:center;overflow:hidden;border-bottom:1px solid rgba(197,155,75,.25);background:radial-gradient(circle at 50% 12%,#fff,rgba(246,223,229,.7) 65%,#fcfaf6)}
+.garland{display:block;margin:0 auto;max-width:380px;width:100%;transform-origin:top center;animation:swing 5s ease-in-out infinite alternate}
+@keyframes swing{from{transform:rotate(-.8deg)}to{transform:rotate(.8deg)}}
+.balloon{position:absolute;width:44px;height:56px;border-radius:50% 50% 48% 48%;z-index:1;animation:rise 7s ease-in-out infinite alternate;opacity:.9}
+.balloon::before{content:"";position:absolute;left:12px;top:9px;width:9px;height:14px;border-radius:50%;background:rgba(255,255,255,.55);transform:rotate(20deg)}
+.balloon::after{content:"";position:absolute;left:50%;top:100%;width:1px;height:46px;background:rgba(107,89,80,.4)}
+@keyframes rise{from{transform:translateY(14px) rotate(-5deg)}to{transform:translateY(-14px) rotate(5deg)}}
+.one{position:relative;width:96px;height:96px;margin:10px auto 6px;display:flex;align-items:center;justify-content:center;font:italic 700 56px 'Cormorant Garamond',serif;color:var(--gold)}
+.one::before{content:"";position:absolute;inset:0;border-radius:50%;border:2px dashed var(--gold);animation:spin 16s linear infinite}
+.one::after{content:"";position:absolute;inset:10px;border-radius:50%;background:#fff;z-index:-1;box-shadow:0 8px 22px rgba(197,155,75,.35)}
+.pill{display:inline-block;padding:6px 16px;border-radius:999px;background:#fff;border:1px solid var(--gold);font:600 10.5px 'Noto Serif',serif;letter-spacing:2.2px;color:var(--gold);margin:6px 0 12px}
+.name{font:italic 600 clamp(36px,10vw,50px)/1.05 'Cormorant Garamond',serif;background:linear-gradient(100deg,#3a2b24 30%,#c59b4b 45%,#f0dcb0 50%,#c59b4b 55%,#3a2b24 70%);background-size:250% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shimmer 5s linear infinite}
+@keyframes shimmer{from{background-position:120% 0}to{background-position:-120% 0}}
+.sub{max-width:340px;margin:12px auto 18px;font-size:13px;line-height:1.75;color:var(--muted)}
+.cake{width:54px;margin:0 auto 14px;display:block;overflow:visible}
+.flame{transform-origin:27px 12px;animation:flicker .35s ease-in-out infinite alternate}
+@keyframes flicker{from{transform:scale(1,1) rotate(-3deg)}to{transform:scale(.88,1.15) rotate(3deg)}}
+.music{display:inline-flex;align-items:center;gap:8px;padding:9px 18px;border-radius:999px;background:#fff;border:1px solid #dfd0bc;color:var(--ink);font:11.5px 'Noto Serif',serif;cursor:pointer;box-shadow:0 4px 14px rgba(58,43,36,.08)}
+.eq{display:inline-flex;gap:2px;align-items:flex-end;height:12px}
+.eq i{width:3px;height:4px;background:var(--gold);border-radius:2px}
+.music.playing .eq i{animation:eq .8s ease-in-out infinite alternate}
+.music.playing .eq i:nth-child(2){animation-delay:.2s}.music.playing .eq i:nth-child(3){animation-delay:.4s}
+@keyframes eq{to{height:12px}}
+.wrap{padding:20px 18px 0;display:flex;flex-direction:column;gap:18px}
+.card{background:#fff;border:1.5px solid #e6d7c3;border-radius:20px;padding:6px;box-shadow:0 10px 26px rgba(58,43,36,.06);transition:transform .35s,box-shadow .35s}
+.card:hover{transform:translateY(-4px);box-shadow:0 16px 34px rgba(58,43,36,.12)}
+.inner{border:1px solid rgba(197,155,75,.35);border-radius:15px;padding:22px 18px;text-align:center}
+.h2{font:italic 600 28px 'Cormorant Garamond',serif;margin-bottom:10px}
+.grid2{display:grid;grid-template-columns:1fr;gap:10px;margin:14px 0}
+.box{background:var(--ivory);border:1px solid #eadfce;border-radius:12px;padding:14px 10px}
+.lbl{font-size:10px;letter-spacing:1.8px;color:var(--muted);margin-bottom:4px}
+.val{font:700 22px 'Cormorant Garamond',serif}
+.venue{background:linear-gradient(135deg,#fdf6f7,#faf4ec);border:1px solid #ebd7dc;border-radius:14px;padding:14px;margin-top:8px}
+.venue strong{display:block;font-size:13.5px;margin-bottom:4px}
+.venue span{font-size:12px;color:var(--muted);line-height:1.5;display:block}
+.map{display:inline-block;margin-top:10px;font:700 11px 'Noto Serif',serif;letter-spacing:1.5px;color:var(--gold);text-decoration:none;border-bottom:1px solid var(--gold);padding-bottom:2px}
+.cd{background:linear-gradient(135deg,#4b382f,#33251e);color:#fff;border-radius:20px;padding:24px 16px;text-align:center;box-shadow:0 12px 28px rgba(51,37,30,.22);position:relative;overflow:hidden}
+.cd::before{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 40%,rgba(240,220,176,.14) 50%,transparent 60%);background-size:250% 100%;animation:shine 6s ease-in-out infinite}
+.cap{font-size:10.5px;letter-spacing:2.5px;color:var(--goldL);margin-bottom:14px}
+.row{display:flex;justify-content:center;gap:10px;position:relative}
+.cell{min-width:56px;background:rgba(255,255,255,.08);border:1px solid rgba(235,214,164,.25);border-radius:12px;padding:10px 6px}
+.num{font:600 30px/1 'Cormorant Garamond',serif;display:inline-block}
+.num.tick{animation:tick .45s cubic-bezier(.3,1.6,.5,1)}
+@keyframes tick{0%{transform:translateY(-10px) scale(.8);opacity:.3}100%{transform:none;opacity:1}}
+.unit{font-size:9px;letter-spacing:1.4px;color:#d9c8b8;margin-top:5px}
+.photos{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.photo{background:var(--cream);padding:6px 6px 10px;border-radius:12px;border:1px solid #eadfce;transition:transform .4s}
+.photo:nth-child(1){transform:rotate(-2deg)}.photo:nth-child(2){transform:rotate(2deg)}
+.photo:hover{transform:rotate(0) scale(1.05)}
+.ph{height:140px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#f6dfe5,#d6c9e6,#f6dfe5);background-size:200% 200%;animation:grad 6s ease-in-out infinite alternate}
+@keyframes grad{to{background-position:100% 100%}}
+.ph svg{animation:beat 1.6s ease-in-out infinite}
+@keyframes beat{50%{transform:scale(1.18)}}
+.photo span{display:block;margin-top:6px;font-size:11px;color:var(--muted)}
+.field{text-align:left;margin-bottom:14px}
+.field label{display:block;font-size:11.5px;font-weight:600;margin-bottom:6px}
+.inp{width:100%;padding:11px 13px;border-radius:10px;border:1px solid #d9c7b2;background:var(--ivory);font:13px 'Noto Serif',serif;color:var(--ink);transition:border-color .3s,box-shadow .3s}
+.inp:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 4px rgba(197,155,75,.18)}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.opts.c4{grid-template-columns:repeat(4,1fr)}
+.opt{padding:10px 8px;border-radius:10px;border:1px solid #e2d3c1;background:var(--ivory);color:var(--ink);font:12px 'Noto Serif',serif;cursor:pointer;transition:all .2s}
+.opt.active{background:var(--ink);color:#fff;border-color:var(--ink);animation:pop .35s}
+@keyframes pop{50%{transform:scale(1.1)}}
+.btn{position:relative;overflow:hidden;width:100%;padding:14px;border:none;border-radius:999px;background:linear-gradient(135deg,#c59b4b,#a87e32);color:#fff;font:700 12px 'Noto Serif',serif;letter-spacing:2px;cursor:pointer;margin-top:6px;box-shadow:0 8px 18px rgba(168,126,50,.28);transition:transform .2s}
+.btn:active{transform:scale(.97)}
+.ripple{position:absolute;border-radius:50%;background:rgba(255,255,255,.55);transform:scale(0);animation:rip .6s ease-out forwards;pointer-events:none}
+@keyframes rip{to{transform:scale(4);opacity:0}}
+.done{display:none;margin-top:14px;padding:12px;border-radius:12px;background:#fdf3f5;border:1px solid var(--rose);font-size:12.5px}
+.done.show{display:block;animation:pop .6s}
+.foot{text-align:center;margin-top:24px}
+.back{background:none;border:none;border-bottom:1px solid var(--muted);color:var(--muted);font:11px 'Noto Serif',serif;letter-spacing:2px;padding-bottom:3px;cursor:pointer}
+
+.h2::after{content:"";display:block;height:2px;width:0;margin:8px auto 0;background:linear-gradient(90deg,transparent,var(--gold),transparent);transition:width 1.2s ease .5s}
+.reveal.in .h2::after{width:70%}
+.pill{position:relative;overflow:hidden}
+.pill::after{content:"";position:absolute;inset:0;background:linear-gradient(105deg,transparent 40%,rgba(255,255,255,.9) 50%,transparent 60%);background-size:250% 100%;animation:shine 3.5s ease-in-out infinite}
+.balloon{translate:0 var(--py,0px)}
+.one{animation:glowOne 3s ease-in-out infinite}
+@keyframes glowOne{50%{text-shadow:0 0 18px rgba(197,155,75,.7)}}
+.cake{display:none}
+.bigcake{display:block;margin:0 auto;animation:float 3.4s ease-in-out infinite;filter:drop-shadow(0 8px 10px rgba(120,70,80,.22))}
+.flame2{transform-box:fill-box;transform-origin:50% 100%;animation:flicker .35s ease-in-out infinite alternate}
+.glow{transform-box:fill-box;transform-origin:center;animation:glw 1.2s ease-in-out infinite alternate}
+@keyframes glw{to{transform:scale(1.35);opacity:.25}}
+.tw{transform-box:fill-box;transform-origin:center;animation:tw 1.6s ease-in-out infinite}
+@keyframes tw{50%{opacity:.2;transform:scale(.4)}}
+.fh{transform-box:fill-box;transform-origin:center;opacity:0;animation:fup 3.2s ease-in infinite}
+@keyframes fup{0%{transform:translateY(10px) scale(.5);opacity:0}20%{opacity:.95}100%{transform:translateY(-34px) scale(1.2);opacity:0}}
+.big{margin:2px 0 4px;font:italic 600 clamp(54px,16vw,68px)/1.05 'Cormorant Garamond',serif;background:linear-gradient(100deg,#9a7425 30%,#e8c46f 45%,#fff3cf 50%,#e8c46f 55%,#9a7425 70%);background-size:250% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 2px 3px rgba(120,90,30,.22));animation:shimmer 4.5s linear infinite}
+.hero .name.st{animation:up .9s cubic-bezier(.22,1,.36,1) var(--d,0s) forwards,shimmer 5s linear 1.5s infinite}
+.box.line{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 16px;text-align:left;border-left:3px solid var(--gold)}
+.box.line .lbl{margin:0;flex:none}
+.box.line .val{font-size:20px;white-space:nowrap}
+.venue .lbl{text-align:center}
+.banner{position:relative;margin:24px 18px 0;padding:26px 16px 24px;text-align:center;border-radius:20px;background:linear-gradient(135deg,#fdf0f3,#f6ecf9 50%,#fdf4e4);border:1.5px solid #e6d7c3;box-shadow:0 10px 26px rgba(58,43,36,.08);overflow:hidden}
+.banner svg{display:block;margin-left:auto;margin-right:auto}
+.banner::before{content:"";position:absolute;inset:6px;border:1px solid rgba(197,155,75,.5);border-radius:15px;pointer-events:none}
+.banner::after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 40%,rgba(255,255,255,.75) 50%,transparent 60%);background-size:250% 100%;animation:shine 5s ease-in-out infinite;pointer-events:none}
+.bn-s{font:600 10px 'Noto Serif',serif;letter-spacing:3.5px;color:var(--muted);margin-bottom:6px}
+.bn-n{font:italic 600 clamp(28px,8.5vw,36px)/1.2 'Cormorant Garamond',serif;background:linear-gradient(100deg,#9a7425 30%,#e8c46f 45%,#fff3cf 50%,#e8c46f 55%,#9a7425 70%);background-size:250% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shimmer 4.5s linear infinite}
+.hint{letter-spacing:1.2px;font-weight:600;font-size:12.5px}
+.sub .hl{display:block;margin:6px 0 8px;font:italic 700 clamp(30px,9vw,38px)/1.15 'Cormorant Garamond',serif;background:linear-gradient(100deg,#9a7425 30%,#e8c46f 45%,#fff3cf 50%,#e8c46f 55%,#9a7425 70%);background-size:250% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 2px 3px rgba(120,90,30,.2));animation:shimmer 4.5s linear infinite}
+.box.line{background:linear-gradient(135deg,#fff8e8,#fdf1f4);border:1px solid #ecd8aa;border-left:4px solid var(--gold);box-shadow:0 6px 16px rgba(197,155,75,.16)}
+.box.line .lbl{color:var(--gold);font-weight:700;letter-spacing:1.5px}
+.box.line .val{font-size:21px;font-weight:700}
+.venue{border:1px solid #ecd8aa;box-shadow:0 6px 16px rgba(197,155,75,.16);padding:16px 14px}
+.venue .lbl{color:var(--gold);font-weight:700}
+.venue strong{font:700 19px/1.25 'Cormorant Garamond',serif;margin-bottom:6px}
+.venue span{font-size:12.5px}
+@media (max-width:360px){.box.line .val{font-size:18px}}
+.music{font-family:'Noto Serif',serif;font-size:13px;font-weight:600;padding:11px 22px;background:linear-gradient(135deg,#fff,#fdf1f4);border:1.5px solid var(--gold);box-shadow:0 6px 18px rgba(197,155,75,.28);letter-spacing:.4px}
+.box.line .val{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:700;font-size:22px;letter-spacing:.4px;font-variant-numeric:lining-nums;background:linear-gradient(100deg,#7a5a1c,#c59b4b 50%,#7a5a1c);-webkit-background-clip:text;background-clip:text;color:transparent}
+.num{font-variant-numeric:lining-nums}
+@media (max-width:360px){.box.line .val{font-size:18px}}
+.ph{position:relative;overflow:hidden}
+.ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+/* ===== reveal + entrance ===== */
+@keyframes fadeUp{from{opacity:0;transform:translate(-50%,18px)}to{opacity:1;transform:translate(-50%,0)}}
+.badge{animation-name:fadeUp}
+.reveal{opacity:0;transform:translateY(34px) scale(.97);transition:opacity .9s cubic-bezier(.22,1,.36,1),transform .9s cubic-bezier(.22,1,.36,1);transition-delay:var(--d,0s)}
+.reveal.in{opacity:1;transform:none}
+.hero .st{opacity:0;animation:up .9s cubic-bezier(.22,1,.36,1) forwards;animation-delay:var(--d,0s);animation-play-state:paused}
+.started .hero .st{animation-play-state:running}
+@keyframes up{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}.reveal,.hero .st{opacity:1;transform:none}}
+</style>
+</head>
+<body class="locked">
+<canvas id="fx"></canvas>
+<div id="progress"></div>
+<audio id="music" src="Булцгар найзууд Төрсөн өдрийн дуу.mp3" loop preload="auto"></audio>
+
+<section class="stage" id="stage">
+  <div class="backdrop"></div>
+  <span class="bokeh" style="width:120px;height:120px;left:6%;top:12%;background:#f4c9d6"></span>
+  <span class="bokeh" style="width:160px;height:160px;right:2%;top:30%;background:#d6c9e6;animation-delay:-3s"></span>
+  <span class="bokeh" style="width:100px;height:100px;left:12%;bottom:14%;background:#f0dcb0;animation-delay:-5s"></span>
+  <div class="rays"></div>
+
+  <div class="arch">
+    <svg class="crown" viewBox="0 0 210 64" fill="none">
+      <path d="M20,56 C55,20 155,20 190,56" stroke="#d5c1a8" stroke-width="4" fill="#f7efe6"/>
+      <circle cx="105" cy="24" r="14" fill="#f4ebe1" stroke="#c59b4b" stroke-width="2"/><circle cx="105" cy="24" r="6" fill="#e5c787"/>
+      <circle cx="76" cy="34" r="8" fill="#f2d3dc"/><circle cx="134" cy="34" r="8" fill="#dfd2ec"/>
+    </svg>
+    <div class="frame"></div>
+    <div class="door">
+      <div class="flap"></div>
+      <svg class="lines" viewBox="0 0 360 580" preserveAspectRatio="none">
+        <line x1="0" y1="150" x2="180" y2="290" stroke="rgba(165,142,118,.45)" stroke-width="2"/><line x1="360" y1="150" x2="180" y2="290" stroke="rgba(165,142,118,.45)" stroke-width="2"/>
+        <line x1="0" y1="450" x2="155" y2="290" stroke="rgba(165,142,118,.35)" stroke-width="1.5"/><line x1="360" y1="450" x2="205" y2="290" stroke="rgba(165,142,118,.35)" stroke-width="1.5"/>
+      </svg>
+      <div class="gtitle"><b>Урилга</b><svg width="130" height="14" viewBox="0 0 130 14" fill="none"><path d="M2 7h50M78 7h50" stroke="#c59b4b" stroke-width="1.2" stroke-linecap="round"/><path d="M65 1c2.500 3 4 4 6 6-2 2-3.500 3-6 6-2.500-3-4-4-6-6 2-2 3.500-3 6-6z" fill="#c59b4b"/></svg></div>
+      <div class="handle"></div>
+    </div>
+    <button type="button" class="seal" id="sealBtn" aria-label="Урилга нээх">
+      <svg width="100" height="100" viewBox="0 0 100 100" fill="none">
+        <defs><ellipse id="pa" cx="50" cy="26" rx="8" ry="21"/><ellipse id="pb" cx="50" cy="33" rx="7" ry="15"/><ellipse id="pc" cx="50" cy="39" rx="5.500" ry="10"/><ellipse id="lf" cx="50" cy="9" rx="3.500" ry="7"/></defs>
+        <circle cx="50" cy="50" r="46" stroke="#c59b4b" stroke-width="1.4" stroke-dasharray="1 4.500" stroke-linecap="round"/>
+        <g class="sp2" fill="#9cb196"><use href="#lf" transform="rotate(22 50 50)"/><use href="#lf" transform="rotate(112 50 50)"/><use href="#lf" transform="rotate(202 50 50)"/><use href="#lf" transform="rotate(292 50 50)"/></g>
+        <g class="sp1" fill="#f6d3dc" stroke="#e3a3b6" stroke-width=".6"><use href="#pa"/><use href="#pa" transform="rotate(45 50 50)"/><use href="#pa" transform="rotate(90 50 50)"/><use href="#pa" transform="rotate(135 50 50)"/><use href="#pa" transform="rotate(180 50 50)"/><use href="#pa" transform="rotate(225 50 50)"/><use href="#pa" transform="rotate(270 50 50)"/><use href="#pa" transform="rotate(315 50 50)"/></g>
+        <g class="sp2" fill="#ecb3c4" stroke="#d98fa8" stroke-width=".6"><use href="#pb" transform="rotate(22 50 50)"/><use href="#pb" transform="rotate(67 50 50)"/><use href="#pb" transform="rotate(112 50 50)"/><use href="#pb" transform="rotate(157 50 50)"/><use href="#pb" transform="rotate(202 50 50)"/><use href="#pb" transform="rotate(247 50 50)"/><use href="#pb" transform="rotate(292 50 50)"/><use href="#pb" transform="rotate(337 50 50)"/></g>
+        <g class="sp3" fill="#fff6dc" stroke="#c59b4b" stroke-width=".6"><use href="#pc"/><use href="#pc" transform="rotate(60 50 50)"/><use href="#pc" transform="rotate(120 50 50)"/><use href="#pc" transform="rotate(180 50 50)"/><use href="#pc" transform="rotate(240 50 50)"/><use href="#pc" transform="rotate(300 50 50)"/></g>
+        <g class="core"><circle cx="50" cy="50" r="7.500" fill="#c59b4b" stroke="#fff3cf" stroke-width="1.500"/><circle cx="48" cy="48" r="2.500" fill="#fff3cf" opacity=".8"/></g>
+      </svg>
+    </button>
+  </div>
+
+  <div class="badge"><div class="crest">А</div><button type="button" class="hint" id="hintBtn">Цэцгэн дээр дарна уу</button></div>
+</section>
+
+<main class="page" id="page">
+  <header class="hero">
+    <svg class="garland st" style="--d:.1s" height="68" viewBox="0 0 380 68" fill="none">
+      <path d="M10,8 Q190,44 370,8" stroke="#8da387" stroke-width="2"/>
+      <g fill="#f3c6d0"><circle cx="56" cy="24" r="9"/><circle cx="324" cy="24" r="9"/></g><g fill="#e5b3bf"><circle cx="56" cy="36" r="7"/><circle cx="324" cy="36" r="7"/></g>
+      <g fill="#dfd6ea"><circle cx="120" cy="32" r="10"/><circle cx="260" cy="32" r="10"/></g><g fill="#cbbde0"><circle cx="120" cy="46" r="7"/><circle cx="260" cy="46" r="7"/></g>
+      <circle cx="190" cy="36" r="11" fill="#f7dce2"/><circle cx="190" cy="52" r="8" fill="#e8b8c4"/>
+    </svg>
+    <span class="balloon" style="left:5%;top:90px;background:#f3c6d0"></span>
+    <span class="balloon" style="right:5%;top:120px;background:#d6c9e6;animation-delay:-2.5s;width:38px;height:48px"></span>
+    <span class="balloon" style="left:12%;top:300px;background:#f0dcb0;animation-delay:-4s;width:34px;height:44px"></span>
+
+    <div class="st" style="--d:.25s"><svg class="bigcake" width="176" viewBox="0 0 160 150" fill="none"><ellipse cx="80" cy="140" rx="68" ry="7" fill="#e6d5bd"/><ellipse cx="80" cy="137" rx="62" ry="6" fill="#f5ece2" stroke="#d7c3aa"/><rect x="20" y="94" width="120" height="40" rx="10" fill="#f6d3dc" stroke="#e3a3b6" stroke-width="1.2"/><path d="M20 106q10 10 20 0t20 0 20 0 20 0 20 0 20 0" stroke="#fff" stroke-width="5" stroke-linecap="round" fill="none"/><rect x="42" y="62" width="76" height="34" rx="9" fill="#fff6dc" stroke="#c59b4b" stroke-width="1.2"/><path d="M42 73q9.5 9 19 0t19 0 19 0 19 0" stroke="#f3c6d0" stroke-width="5" stroke-linecap="round" fill="none"/><circle class="tw" cx="34" cy="122" r="2.5" fill="#c59b4b"/><circle class="tw" cx="58" cy="119" r="2.5" fill="#fff" style="animation-delay:.4s"/><circle class="tw" cx="82" cy="124" r="2.5" fill="#d6c9e6" style="animation-delay:.8s"/><circle class="tw" cx="106" cy="119" r="2.5" fill="#c59b4b" style="animation-delay:1.2s"/><circle class="tw" cx="126" cy="124" r="2.5" fill="#fff" style="animation-delay:.2s"/><circle class="tw" cx="54" cy="87" r="2.2" fill="#e8a9bd" style="animation-delay:.6s"/><circle class="tw" cx="106" cy="87" r="2.2" fill="#c59b4b" style="animation-delay:1s"/><path d="M66 31L77 23H89V62H77V37L66 41Z" fill="#f0c25a" stroke="#c59b4b" stroke-width="1.2" stroke-linejoin="round"/><path d="M82 40V58" stroke="#fff" stroke-width="2" opacity=".55" stroke-linecap="round"/><path d="M83 23V18" stroke="#5b434d" stroke-width="1.6" stroke-linecap="round"/><circle class="glow" cx="83" cy="11" r="11" fill="#ffe9a8" opacity=".5"/><path class="flame2" d="M83 2C88 9 88 15 83 18 78 15 78 9 83 2Z" fill="#f5b942"/><path class="flame2" d="M83 9C85 12 85 15 83 17 81 15 81 12 83 9Z" fill="#fff3b0"/><g transform="translate(28 70)"><path class="fh" d="M0 3C-5-2-3-7 0-4 3-7 5-2 0 3Z" fill="#e8a9bd"/></g><g transform="translate(136 62)"><path class="fh" d="M0 3C-5-2-3-7 0-4 3-7 5-2 0 3Z" fill="#d6a8d8" style="animation-delay:1s"/></g><g transform="translate(18 92)"><path class="fh" d="M0 3C-5-2-3-7 0-4 3-7 5-2 0 3Z" fill="#f0c25a" style="animation-delay:2s"/></g><g transform="translate(144 88)"><path class="fh" d="M0 3C-5-2-3-7 0-4 3-7 5-2 0 3Z" fill="#e8a9bd" style="animation-delay:1.5s"/></g><g transform="translate(112 50)"><path class="fh" d="M0 3C-5-2-3-7 0-4 3-7 5-2 0 3Z" fill="#f0c25a" style="animation-delay:.5s"/></g></svg></div>
+    <div class="st" style="--d:.4s"><div class="big">Урилга</div></div>
+    <p class="sub st" style="--d:.75s">Эрхэм хүндэт таныг бидний хайрт охин<span class="hl">Б.Амин-Эрдэнийн</span>“1 насны төрсөн өдрийн баярт” гэр бүлийн хамт хүрэлцэн ирэхийг урьж байна.</p>
+    <svg class="cake st" style="--d:.9s" viewBox="0 0 54 56" fill="none">
+      <path class="flame" d="M27 2C31 8 31 12 27 14 23 12 23 8 27 2Z" fill="#f5b942"/>
+      <rect x="25.5" y="13" width="3" height="10" rx="1.5" fill="#e8b8c4"/>
+      <rect x="6" y="23" width="42" height="14" rx="5" fill="#f7dce2" stroke="#dfa7b6"/>
+      <path d="M6 30q5 5 10 0t10 0 10 0 10 0" stroke="#fff" stroke-width="2" fill="none"/>
+      <rect x="2" y="37" width="50" height="14" rx="5" fill="#f0dcb0" stroke="#c59b4b"/>
+    </svg>
+    <button type="button" class="music st" style="--d:1s" id="musicBtn"><span class="eq"><i></i><i></i><i></i></span><span id="musicLabel">🎶 Баярын хөгжим тоглуулах</span></button>
+  </header>
+
+  <div class="wrap">
+    <section class="card reveal"><div class="inner">
+      <div class="grid2">
+        <div class="box line"><span class="lbl">ОГНОО</span><span class="val">2026 оны 12-р сарын 15</span></div>
+        <div class="box line"><span class="lbl">ЦАГ</span><span class="val">15:00 цагт</span></div>
+      </div>
+      <div class="venue"><div class="lbl" style="letter-spacing:3px;margin-bottom:6px">БАЙРШИЛ</div><strong>Garden Hall — Цэцэрлэгт Танхим</strong><span>Улаанбаатар хот, Хан-Уул дүүрэг, Зайсангийн гудамж</span>
+        <a class="map" href="https://www.google.com/maps/search/?api=1&query=Ulaanbaatar+Zaisan" target="_blank" rel="noopener noreferrer">ГАЗРЫН ЗУРАГ ХАРАХ ↗</a></div>
+    </div></section>
+
+    <section class="cd reveal"><div class="cap">БАЯРЫН ӨДӨР ХҮРТЭЛ</div>
+      <div class="row">
+        <div class="cell"><div class="num" id="cdD">00</div><div class="unit">ӨДӨР</div></div>
+        <div class="cell"><div class="num" id="cdH">00</div><div class="unit">ЦАГ</div></div>
+        <div class="cell"><div class="num" id="cdM">00</div><div class="unit">МИНУТ</div></div>
+        <div class="cell"><div class="num" id="cdS">00</div><div class="unit">СЕКУНД</div></div>
+      </div>
+    </section>
+
+    <section class="card reveal"><div class="inner">
+      <h2 class="h2">Бяцхан Дурсамж</h2>
+      <div class="photos">
+        <div class="photo"><div class="ph"><svg width="44" height="44" viewBox="0 0 24 24" fill="#fff"><path d="M12 21s-7.5-4.6-9.6-9.2C1 8.5 3 5 6.4 5c2 0 3.6 1.1 5.6 3.2C14 6.1 15.600 5 17.600 5 21 5 23 8.500 21.600 11.800 19.500 16.400 12 21 12 21z"/></svg><img src="1.JPG" alt="Анхны инээмсэглэл" loading="lazy" onerror="this.style.display='none'"></div><span>Анхны инээмсэглэл</span></div>
+        <div class="photo"><div class="ph" style="animation-delay:-3s"><svg width="44" height="44" viewBox="0 0 24 24" fill="#fff"><path d="M12 2l2.900 6.300 6.900.8-5.100 4.700 1.400 6.800L12 17.200 5.900 20.600l1.400-6.800L2.200 9.100l6.900-.8z"/></svg><img src="2.JPG" alt="1 насны мөч" loading="lazy" onerror="this.style.display='none'"></div><span>1 насны мөч</span></div>
+      </div>
+    </div></section>
+
+    <section class="card reveal"><div class="inner">
+      <h2 class="h2">Хариу илгээх</h2>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:16px">Та хүрэлцэн ирэх эсэхээ урьдчилан баталгаажуулна уу.</p>
+      <form id="rsvp">
+        <div class="field"><label for="gn">Таны нэр</label><input class="inp" id="gn" type="text" placeholder="Жишээ: Болд" required></div>
+        <div class="field"><label>Оролцох эсэх</label><div class="opts"><button type="button" class="opt active">Оролцоно 🎂</button><button type="button" class="opt">Боломжгүй байна</button></div></div>
+        <div class="field"><label>Хүний тоо</label><div class="opts c4"><button type="button" class="opt active">1</button><button type="button" class="opt">2</button><button type="button" class="opt">3</button><button type="button" class="opt">4+</button></div></div>
+        <div class="field"><label for="gw">Ерөөл ба тэмдэглэл</label><input class="inp" id="gw" type="text" placeholder="Сайхан ерөөл үлдээнэ үү..."></div>
+        <button type="submit" class="btn">ХАРИУ ИЛГЭЭХ</button>
+        <div class="done" id="done">Баярлалаа! Таны хариу амжилттай бүртгэгдлээ. 🎉</div>
+      </form>
+    </div></section>
+  </div>
+
+  <div class="banner reveal"><svg width="130" height="14" viewBox="0 0 130 14" fill="none" style="margin-bottom:10px"><path d="M2 7h50M78 7h50" stroke="#c59b4b" stroke-width="1.2" stroke-linecap="round"/><path d="M65 1c2.5 3 4 4 6 6-2 2-3.5 3-6 6-2.5-3-4-4-6-6 2-2 3.5-3 6-6z" fill="#c59b4b"/></svg><div class="bn-s">ХҮНДЭТГЭСЭН</div><div class="bn-n">С.Баярын гэр бүл</div><svg width="130" height="14" viewBox="0 0 130 14" fill="none" style="margin-top:10px"><path d="M2 7h50M78 7h50" stroke="#c59b4b" stroke-width="1.2" stroke-linecap="round"/><path d="M65 1c2.5 3 4 4 6 6-2 2-3.5 3-6 6-2.5-3-4-4-6-6 2-2 3.5-3 6-6z" fill="#c59b4b"/></svg></div>
+  <div class="foot"><button type="button" class="back" id="backBtn">&lt; ХААЛГА РУУ БУЦАХ</button></div>
+</main>
+
+<script>
+(function(){
+var $=function(i){return document.getElementById(i)};
+var stage=$('stage'),body=document.body,audio=$('music'),mBtn=$('musicBtn'),mLbl=$('musicLabel');
+
+/* эрвээхэй ба баглаа */
+var bfT='<svg class="bf" viewBox="0 0 40 40" style="__S__"><g class="a"><path d="M20,20C12,6 2,10 5,21 7,27 14,25 20,22Z" fill="__1__"/><path d="M20,22C13,24 8,32 14,35 18,36 20,29 20,22Z" fill="__2__"/></g><g class="b"><path d="M20,20C28,6 38,10 35,21 33,27 26,25 20,22Z" fill="__1__"/><path d="M20,22C27,24 32,32 26,35 22,36 20,29 20,22Z" fill="__2__"/></g><line x1="20" y1="13" x2="20" y2="29" stroke="#5b434d" stroke-width="1.5" stroke-linecap="round"/></svg>';
+[['top:18%;left:14%;animation:fly 9s ease-in-out infinite','#e8b4c8','#d3bce3'],['top:26%;right:15%;width:32px;animation:fly 11s ease-in-out infinite reverse','#d7c2e8','#f0c5d4'],['top:54%;right:18%;width:34px;animation:fly 8s ease-in-out infinite','#f2c6d4','#e2d1ee'],['bottom:26%;left:16%;width:30px;animation:fly 12s ease-in-out infinite','#e6b6c9','#d3bce3']].forEach(function(b){
+  stage.insertAdjacentHTML('beforeend',bfT.replace('__S__',b[0]).replace(/__1__/g,b[1]).replace(/__2__/g,b[2]));
+});
+var bqT='<svg class="bq __C__" viewBox="0 0 180 150" fill="none"><ellipse cx="42" cy="112" rx="26" ry="14" transform="rotate(-25 42 112)" fill="#9cb196"/><ellipse cx="95" cy="124" rx="28" ry="14" transform="rotate(14 95 124)" fill="#8ba385"/><circle cx="52" cy="96" r="24" fill="#edd1dc"/><circle cx="46" cy="92" r="14" fill="#f7e3ea"/><circle cx="88" cy="108" r="26" fill="#dfd2ec"/><circle cx="84" cy="104" r="15" fill="#ece3f5"/><circle cx="122" cy="122" r="20" fill="#e6b8c9"/><circle cx="32" cy="122" r="18" fill="#d5c4e6"/></svg>';
+document.querySelector('.arch').insertAdjacentHTML('beforeend',bqT.replace('__C__','l')+bqT.replace('__C__','r'));
+
+/* canvas: ягаан дэлбээ, оч, конфетти */
+var cv=$('fx'),ctx=cv.getContext('2d'),W,H,amb=[],conf=[];
+function rs(){W=cv.width=innerWidth;H=cv.height=innerHeight}
+addEventListener('resize',rs);rs();
+var pc=['#f3c6d0','#e8b4c8','#dfd2ec','#f7dce2'];
+for(var i=0;i<30;i++)amb.push({x:Math.random()*W,y:Math.random()*H,s:Math.random()*6+5,vy:Math.random()*.6+.3,vx:Math.random()*.6-.2,r:Math.random()*6,vr:Math.random()*.04-.02,ph:Math.random()*6,c:pc[i%4],sp:i%3==0});
+var cc=['#f3c6d0','#c59b4b','#d6c9e6','#f0dcb0','#e8b4c8','#869c80'];
+function burst(x,y,n){for(var i=0;i<n;i++){var a=Math.random()*Math.PI*2,v=Math.random()*9+4;conf.push({x:x,y:y,vx:Math.cos(a)*v,vy:Math.sin(a)*v-6,w:Math.random()*8+4,h:Math.random()*5+3,r:Math.random()*6,vr:Math.random()*.4-.2,c:cc[i%6],l:1})}}
+var sp=[],lt=0;
+function spark(x,y,n,h){for(var i=0;i<n;i++)sp.push({x:x,y:y,vx:(Math.random()-.5)*(h?6:1.5),vy:(Math.random()-.5)*(h?6:1.5)-(h?2:0),l:1,s:Math.random()*5+(h?8:4),h:h,c:cc[i%6]})}
+addEventListener('pointermove',function(e){var n=Date.now();if(n-lt>40){lt=n;spark(e.clientX,e.clientY,1,false)}});
+addEventListener('pointerdown',function(e){if(!e.target.closest('button,input,a'))spark(e.clientX,e.clientY,10,true)});
+function loop(){
+  ctx.clearRect(0,0,W,H);
+  for(var j=sp.length-1;j>=0;j--){
+    var q=sp[j];q.x+=q.vx;q.y+=q.vy;q.vy+=q.h?.06:.02;q.l-=.025;
+    if(q.l<=0){sp.splice(j,1);continue}
+    ctx.save();ctx.globalAlpha=q.l;ctx.fillStyle=q.c;ctx.translate(q.x,q.y);
+    if(q.h){ctx.scale(q.s/12,q.s/12);ctx.beginPath();ctx.moveTo(0,3);ctx.bezierCurveTo(-8,-3,-4,-9,0,-4);ctx.bezierCurveTo(4,-9,8,-3,0,3);ctx.fill()}
+    else{ctx.rotate(q.l*4);ctx.fillRect(-q.s,-.7,q.s*2,1.4);ctx.fillRect(-.7,-q.s,1.4,q.s*2)}
+    ctx.restore();
+  }
+  amb.forEach(function(p){
+    p.y+=p.vy;p.x+=p.vx+Math.sin(p.ph+=.02)*.5;p.r+=p.vr;
+    if(p.y>H+14){p.y=-14;p.x=Math.random()*W}
+    ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.r);
+    if(p.sp){ctx.fillStyle='rgba(240,205,120,'+(.5+Math.sin(p.ph*3)*.4)+')';ctx.beginPath();ctx.arc(0,0,p.s/4,0,6.3);ctx.fill()}
+    else{ctx.globalAlpha=.75;ctx.fillStyle=p.c;ctx.beginPath();ctx.ellipse(0,0,p.s,p.s/2,0,0,6.3);ctx.fill()}
+    ctx.restore();
+  });
+  for(var i=conf.length-1;i>=0;i--){
+    var c=conf[i];c.vy+=.28;c.vx*=.985;c.x+=c.vx;c.y+=c.vy;c.r+=c.vr;c.l-=.008;
+    if(c.l<=0||c.y>H+20){conf.splice(i,1);continue}
+    ctx.save();ctx.globalAlpha=Math.min(1,c.l*2);ctx.translate(c.x,c.y);ctx.rotate(c.r);ctx.fillStyle=c.c;ctx.fillRect(-c.w/2,-c.h/2,c.w,c.h);ctx.restore();
+  }
+  requestAnimationFrame(loop);
+}
+loop();
+
+/* хаалга */
+function setMusic(on){
+  if(on){audio.play().then(function(){mBtn.classList.add('playing');mLbl.textContent='🎵 Хөгжим зогсоох'}).catch(function(){})}
+  else{audio.pause();mBtn.classList.remove('playing');mLbl.textContent='🎶 Баярын хөгжим тоглуулах'}
+}
+function openGate(){
+  if(stage.classList.contains('open'))return;
+  stage.classList.add('open');
+  setTimeout(function(){burst(W/2,H*.5,140)},700);
+  setTimeout(function(){burst(W*.2,H*.6,60);burst(W*.8,H*.6,60)},1100);
+  setTimeout(function(){body.classList.remove('locked');body.classList.add('started')},1500);
+  setMusic(true);
+}
+$('sealBtn').onclick=openGate;$('hintBtn').onclick=openGate;
+$('backBtn').onclick=function(){scrollTo({top:0});stage.classList.remove('open');body.classList.add('locked');body.classList.remove('started')};
+mBtn.onclick=function(){
+  if(audio.paused){audio.play().then(function(){mBtn.classList.add('playing');mLbl.textContent='🎵 Хөгжим зогсоох'}).catch(function(){alert('Дууны файл холбогдоогүй байна.')})}
+  else setMusic(false);
+};
+
+/* scroll reveal + progress */
+var els=document.querySelectorAll('.reveal');
+if('IntersectionObserver' in window){
+  var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{threshold:.15});
+  els.forEach(function(el,i){el.style.setProperty('--d',(i%2*.1)+'s');io.observe(el)});
+}else els.forEach(function(el){el.classList.add('in')});
+addEventListener('scroll',function(){var m=document.documentElement.scrollHeight-innerHeight;$('progress').style.width=(m>0?scrollY/m*100:0)+'%';document.querySelectorAll('.balloon').forEach(function(b,i){b.style.setProperty('--py',(-scrollY*(.12+i*.05))+'px')})},{passive:true});
+
+/* ripple */
+document.addEventListener('click',function(e){
+  var b=e.target.closest('.btn,.opt,.music');if(!b)return;
+  if(b.classList.contains('opt')){b.parentNode.querySelectorAll('.opt').forEach(function(o){o.classList.remove('active')});b.classList.add('active')}
+  var r=b.getBoundingClientRect(),s=document.createElement('span'),d=Math.max(r.width,r.height)/2;
+  s.className='ripple';s.style.cssText='width:'+d+'px;height:'+d+'px;left:'+(e.clientX-r.left-d/2)+'px;top:'+(e.clientY-r.top-d/2)+'px';
+  if(getComputedStyle(b).position==='static')b.style.position='relative';
+  b.style.overflow='hidden';b.appendChild(s);setTimeout(function(){s.remove()},650);
+});
+
+/* RSVP */
+$('rsvp').addEventListener('submit',function(e){
+  e.preventDefault();
+  var f=e.target,btn=f.querySelector('.btn'),dn=$('done'),g=f.querySelectorAll('.opts');
+  var data={name:$('gn').value,attendance:g[0].querySelector('.active').textContent.trim(),guests:g[1].querySelector('.active').textContent.trim(),wish:$('gw').value};
+  btn.disabled=true;btn.textContent='ИЛГЭЭЖ БАЙНА...';
+  fetch('https://formspree.io/f/mqpqpwlg',{method:'POST',headers:{'Accept':'application/json','Content-Type':'application/json'},body:JSON.stringify(data)})
+  .then(function(r){
+    if(!r.ok)throw new Error('bad');
+    dn.className='done show';dn.textContent='Баярлалаа! Таны хариу амжилттай бүртгэгдлээ. 🎉';
+    var b=btn.getBoundingClientRect();burst(b.left+b.width/2,b.top,110);f.reset();
+  })
+  .catch(function(){dn.className='done show bad';dn.textContent='Уучлаарай, хариуг илгээж чадсангүй. Дахин оролдоно уу.'})
+  .then(function(){btn.disabled=false;btn.textContent='ХАРИУ ИЛГЭЭХ'});
+});
+
+/* тоолуур */
+var target=new Date('2026-12-15T15:00:00+08:00').getTime(),ids=['cdD','cdH','cdM','cdS'];
+function setN(id,v){var el=$(id);if(el.textContent!==v){el.textContent=v;el.classList.remove('tick');void el.offsetWidth;el.classList.add('tick')}}
+function upd(){
+  var t=Math.max(0,target-Date.now()),v=[Math.floor(t/864e5),Math.floor(t/36e5)%24,Math.floor(t/6e4)%60,Math.floor(t/1e3)%60];
+  v.forEach(function(n,i){setN(ids[i],String(n).padStart(2,'0'))});
+}
+upd();setInterval(upd,1000);
+})();
+</script>
+</body>
+</html>
